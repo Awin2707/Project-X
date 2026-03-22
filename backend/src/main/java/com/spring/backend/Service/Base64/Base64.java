@@ -46,9 +46,9 @@ public class Base64 {
         String table = createTable(key);
         StringBuilder decode = new StringBuilder();
         for (Character ch : json.toCharArray()) {
-            int i = DEFAULT_STRING.indexOf(ch);
+            int i = table.indexOf(ch);
             if (i != -1) {
-                decode.append(table.charAt(i));
+                decode.append(DEFAULT_STRING.charAt(i));
             }else{
                 decode.append(ch);
             }
