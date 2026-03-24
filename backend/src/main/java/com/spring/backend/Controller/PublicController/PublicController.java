@@ -21,7 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -37,27 +36,26 @@ public class PublicController {
     @Autowired private JwtToken jToken;
     
     @GetMapping("/version")
-    public ResponseEntity<?> getMethodName(@RequestParam String param) {
+    public ResponseEntity<?> getMethodName() {
         return ResponseEntity.ok("1.0.0");
     }
 
-    @PostMapping("/createAccount")
-    public String createAccount(@RequestBody DataModal data) {
+    @GetMapping("/createAccount")
+    public ResponseEntity<?> createAccount(@RequestBody DataModal data) {
         try {
             UserEntity user = us.createAccount(data);
             if (user != null) {
                 String json = "{message :" + user.getUtoken()+" }";
                 String msg = base64.encode(json, "myKeySecret");
-                ResponseEntity.ok().body(msg);
+                return ResponseEntity.ok().body(msg);
             }else{
-                ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
+                return ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
             }
         } catch (Exception e) {
             String json = "{message :" + e.getMessage()+" }";
             String msg = base64.encode(json, "myKeySecret");
-            ResponseEntity.ok().body(msg);
+            return ResponseEntity.badRequest().body(msg);
         }
-        return null;
     }
 
     @PostMapping("/verify")

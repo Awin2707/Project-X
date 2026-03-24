@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -33,8 +34,11 @@ public class Config {
             ).cors((cors) -> cors.configurationSource(configurationSource())
             ).formLogin((form) -> form.disable())
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(auth,UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests((auth) -> auth.requestMatchers("/public/**").permitAll().anyRequest().authenticated()).build();
+.authorizeHttpRequests((auth) -> auth
+    .requestMatchers("/public/**").permitAll()
+    .requestMatchers(org.springframework.http.HttpMethod.POST, "/public/**").permitAll() // ✅ ADD THIS
+    .anyRequest().authenticated()
+)                        .addFilterBefore(auth,UsernamePasswordAuthenticationFilter.class).build();
     }
 
     @Bean
@@ -42,7 +46,7 @@ public class Config {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedHeaders(List.of("*"));
         cors.setAllowedMethods(List.of("GET","POST","PUT","DELETE"));
-        cors.setAllowedOrigins(List.of("http://localhost:3000/", "https://dev-saving-cost.netlify.app/"));
+        cors.setAllowedOrigins(List.of("http://localhost:3000", "https://dev-saving-cost.netlify.app"));
         cors.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource url = new UrlBasedCorsConfigurationSource();
         url.registerCorsConfiguration("/**", cors);
