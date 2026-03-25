@@ -1,5 +1,6 @@
 package com.spring.backend.Service.Base64;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,7 +12,7 @@ public class Base64 {
     public final static String DEFAULT_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     public String createTable(String Key) {
-        Set<Character> list = new TreeSet<>();
+        Set<Character> list = new LinkedHashSet<>();
         for (Character character : Key.toCharArray()) {
             list.add(character);
         }
@@ -46,14 +47,14 @@ public class Base64 {
         String table = createTable(key);
         StringBuilder decode = new StringBuilder();
         for (Character ch : json.toCharArray()) {
-            int i = DEFAULT_STRING.indexOf(ch);
+            int i = table.indexOf(ch);
             if (i != -1) {
-                decode.append(table.charAt(i));
+                decode.append(DEFAULT_STRING.charAt(i));
             }else{
                 decode.append(ch);
             }
         }
         byte[] decode_Byte = java.util.Base64.getDecoder().decode(decode.toString());
-        return decode_Byte.toString();
+        return new String(decode_Byte);
     }
 }
