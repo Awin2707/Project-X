@@ -48,6 +48,7 @@ public class UserService implements RegisterInterface, OtpVerificationInterface,
         String Code = "";
         try {
             String json = base64.decode(dataModal.getData(), key);
+            System.out.println("DECODED JSON: " + json);
             RegisterModal registerModal = obj.readValue(json, RegisterModal.class);
             if (registerModal != null) {
                 obj = null;

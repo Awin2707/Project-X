@@ -21,7 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -37,16 +36,18 @@ public class PublicController {
     @Autowired private JwtToken jToken;
     
     @GetMapping("/version")
-    public ResponseEntity<?> getMethodName(@RequestParam String param) {
+    public ResponseEntity<?> getMethodName() {
+        System.out.println(base64.createTable("myKeySecret"));
         return ResponseEntity.ok("1.0.0");
     }
 
     @PostMapping("/createAccount")
-    public String createAccount(@RequestBody DataModal data) {
+    public ResponseEntity<?> createAccount(@RequestBody DataModal data) {
+        System.out.println("hello");
         try {
             UserEntity user = us.createAccount(data);
             if (user != null) {
-                String json = "{message :" + user.getUtoken()+" }";
+                String json = "{ \"message\": \"" + user.getUtoken() + "\" }";
                 String msg = base64.encode(json, "myKeySecret");
                 ResponseEntity.ok().body(msg);
             }else{
@@ -61,7 +62,7 @@ public class PublicController {
     }
 
     @PostMapping("/verify")
-    public String verifyAccount(@RequestBody DataModal data, HttpServletResponse response) {
+    public ResponseEntity<?> verifyAccount(@RequestBody DataModal data, HttpServletResponse response) {
         try {
             UserEntity user = us.otpVerification(data);
             if (user != null) {
@@ -77,20 +78,22 @@ public class PublicController {
                 response.addCookie(cookie);
                 String json = "{message :" + Token +" }";
                 String msg = base64.encode(json, "myKeySecret");
-                ResponseEntity.ok().body(msg);
+                System.out.println(msg);
+                return ResponseEntity.ok().body(msg);
             }else{
-                ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
+                System.out.println(base64.encode("failed !","myKeySecret"));
+                return ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
             }
         } catch (Exception e) {
             String json = "{message :" + e.getMessage()+" }";
             String msg = base64.encode(json, "myKeySecret");
-            ResponseEntity.ok().body(msg);
+            System.out.println(msg);
+            return ResponseEntity.ok().body(msg);
         }
-        return null;
     }
 
     @PostMapping("/login")
-    public String loginAccount(@RequestBody DataModal data, HttpServletResponse response) {
+    public ResponseEntity<?> loginAccount(@RequestBody DataModal data, HttpServletResponse response) {
         try {
             UserEntity user = us.Login(data);
             if (user != null) {
@@ -106,16 +109,15 @@ public class PublicController {
                 response.addCookie(cookie);
                 String json = "{message :" + Token +" }";
                 String msg = base64.encode(json, "myKeySecret");
-                ResponseEntity.ok().body(msg);
+                return ResponseEntity.ok().body(msg);
             }else{
-                ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
+                return ResponseEntity.badRequest().body(base64.encode("failed !","myKeySecret"));
             }
         } catch (Exception e) {
             String json = "{message :" + e.getMessage()+" }";
             String msg = base64.encode(json, "myKeySecret");
-            ResponseEntity.ok().body(msg);
+            return ResponseEntity.ok().body(msg);
         }
-        return null;
     }
     
 }
