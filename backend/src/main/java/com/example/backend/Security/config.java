@@ -38,7 +38,7 @@ public class config {
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("PUT","POST","GET","DELETE"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowedOrigins(List.of("http://localhost:3000/"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "https://dev-saving-cost.netlify.app"));
         UrlBasedCorsConfigurationSource url = new UrlBasedCorsConfigurationSource();
         url.registerCorsConfiguration("/**", config);
         return url;
