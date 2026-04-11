@@ -24,16 +24,16 @@ public class UserEntity {
     @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "verify", nullable = false)
+    @Column(name = "is_verify", nullable = false)
     private boolean isVerify;
 
-    @Column(name = "isLogout", nullable = false)
+    @Column(name = "is_logout", nullable = false)
     private boolean logout;
 
-    @Column(name = "createdTime", nullable = true)
+    @Column(name = "created_time", nullable = true)
     private LocalDateTime createdTime;
 
-    @Column(name = "LogoutTime", nullable = true)
+    @Column(name = "logout_time", nullable = true)
     private LocalDateTime logoutTime;
 
     @Column(name = "browser")
