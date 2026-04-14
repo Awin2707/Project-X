@@ -11,7 +11,7 @@ const userReducers = createSlice({
     name: "user",
     initialState,
     reducers:{
-        setToken: (state, action) => {state.token = action.payload},
+        setToken: (state, action) => {state.token = action.payload; console.log(action.payload, "mypayload")},
         setUsers: (state, action) => {state.users = action.payload} ,
         setLogout: (state, action) => {state.isLogout = action.payload},
         setAuth: (state, action) => {state.isAuth = action.payload}

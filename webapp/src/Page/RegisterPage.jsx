@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react'
 import main from '../Style/main.module.css'
 import Register from '../Component/Register/Register'
 import Loading from '../Component/Loading/Loading';
+import ApiJson from '../../config.json';
+import {useNavigate} from 'react-router-dom';
+import { apiCall } from '../common/ApiCall/Apicall';
+import { decode } from '../common/Base64/Base64';
+import {useDispatch} from 'react-redux'
+import { setToken, setUsers } from '../Redcuers/UserReducers';
 // import { decode, encode } from '../Common/Base64';
 // import { apiCall } from '../Common/ApiCall';
 function RegisterPage() {
@@ -9,14 +15,16 @@ function RegisterPage() {
     const [data, setData] = useState({
         "name":"",
         "email":"",
-        "pass":""
+        "pass":"",
+        "browser": "brave"
     });
+    const navigate = useNavigate();
     const [msg, errMsg] = useState({});
     const [warn, setWaring] = useState(false);
     const [loading, setloading] = useState(false);
+    const dispatch = useDispatch();
 
     const onchange = (e) => {
-        console.log(e.target.name, e.target.value)
         setData({...data, [e.target.name] : e.target.value});
         errMsg({...msg, [e.target.name]: ""});
     }
@@ -42,18 +50,34 @@ function RegisterPage() {
             setWaring(false);
         }
         errMsg(err);
-        console.log(data);
         return check;
     }
 
     const onSubmit = async () => {
         let bool = validate();
-        
+        setloading(true);
+        if(!bool){
+            await apiCall(ApiJson.apipublic_path+"createAccount", "POST", data).then(async (res) => {
+                const response = await res.json();
+                let err = {};
+                if(res.ok){
+                    console.log(response.msg, response, "myresponse");
+                    dispatch(setToken(response.msg));
+                    dispatch(setUsers(data));
+                    setloading(false);
+                    navigate("/verification")
+                }else if(res.status == 400){
+                    err.email = res.msg;
+                    errMsg(msg);
+                    setloading(false);
+                }
+            });
+            // navigate("/verification")
+        }
     }
 
     return (
         <div className={main.main}>
-            {console.log(data)  }
             <Register values={data} onChange={(e) => onchange(e)} onSubmit={onSubmit} msg={msg} warn={warn} />
             {
                 loading && <Loading />

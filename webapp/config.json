@@ -1,0 +1,4 @@
+{
+    "apipublic_path" : "https://project-x-zdrd.onrender.com/public/api/v1/",
+    "apiprivate_path": "https://project-x-zdrd.onrender.com/private/api/v1"
+}

@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import main from '../../Style/main.module.css';
 import logo from '../../Assets/savingcost.png';
+import { apiCall } from '../../common/ApiCall/Apicall';
+import ApiJson from '../../../config.json';
+import { Navigate, useNavigate } from 'react-router-dom';
+import {useSelector} from 'react-redux';
 
 function Verification() {
 
@@ -8,6 +12,10 @@ function Verification() {
     const ref = useRef([]);
     const[count, setCount] = useState(60);
     const[resend, setResend] = useState(false);
+    const[err, setErr] = useState(false);
+    const navigate = useNavigate();
+    const token = useSelector((state) => state.users.token);
+    const userData = useSelector((state) => state.users.users);
 
     useEffect(() => {
         let interval = setInterval(() => {
@@ -47,6 +55,32 @@ function Verification() {
         }
     }
 
+    const handleSubmit = async () => {
+        let value = otp.join("");
+        console.log(value);
+        let data = {
+            email: userData.email,
+            token: token,
+            code: value
+        }
+        await apiCall(ApiJson.apipublic_path+"verify", "POST",data)
+            .then(async (res) => {
+                let response = await res.json();
+                if(res.ok){
+                    navigate("/home");
+                }else if(res.status == 400){
+                    console.log(response.msg);
+                }
+            })
+    }
+
+    useEffect(() => {
+        console.log(token);
+        if(!token || token == undefined){
+            navigate("/");
+        }
+    },[])
+
     return (
         <div className={main.main}>
             <div className={main.register}>
@@ -69,6 +103,7 @@ function Verification() {
                         }
                     </div>
                     <div className={main.divs3}>
+                        {err && <label>{err}</label>}
                     </div>
                     <div className={main.divs5}>
                         <label className={main.label}>I did not recived the OTP Code ? </label>
@@ -80,7 +115,7 @@ function Verification() {
                     <div className={main.divs3}>
                     </div>
                 </div>
-                <input type='button' value={"Verify"}  className={main.btns} />
+                <input type='button' value={"Verify"}  className={main.btns} onClick={() => handleSubmit()}/>
 
             </div>
         </div>
