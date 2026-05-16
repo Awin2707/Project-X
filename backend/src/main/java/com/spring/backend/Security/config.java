@@ -40,7 +40,7 @@ public class config {
     public CorsConfigurationSource configurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000","https://savingcost.netlify.app"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(List.of("POST","PUT","GET","DELETE"));
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
