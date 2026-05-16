@@ -290,7 +290,26 @@ svg:focus {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
+.box_divs_circle{
+    padding: 5px 25px;
+    /* border: 2px solid #ccc; */
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.label_heading{
+    font-size: 16px;
+    color: #555555;
+    font-weight: 600;
+}
+.label_subheading{
+    font-size: 15px;
+    color: #8B8B8B;
+    font-weight: 400;
+}
 .box_divs_selected {
     padding: 16px;
     border: 1px solid #ccc;

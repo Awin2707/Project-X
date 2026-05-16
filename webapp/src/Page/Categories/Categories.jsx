@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import main from '../../Style/main.module.css';
 import config from '../../Config/config.json';
+import {useSelector, useDispatch} from 'react-redux';
+import {API_CALL} from '../../ApiCall/apicall';
+import { addCategories, setCategories } from '../../Reducers/CategoriesReducer';
 
 function Categories() {
 
@@ -9,6 +12,9 @@ function Categories() {
   const [selected, setSelected] = useState({ img: 1, color: 1 });
   const [data, setData] = useState({});
   const [name, setName] = useState('');
+  const selector = useSelector((val) => val.user);
+  const cate = useSelector((val) => val.categories);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let objs = [
@@ -32,6 +38,18 @@ function Categories() {
     ]
     setImages(objs);
     setColor(colors);
+    const fetchData = async () => {
+    try{
+      const api = await API_CALL('', 'GET', config.private_url + 'listProducts');
+    if(api.response.status === 200){
+      dispatch(setCategories(api.result.msg));
+    }
+    }catch(err){
+      console.error(err);
+      
+    }
+  }
+    fetchData();
   }, []);
   const selectedData = (id) => {
     let objs = { ...selected };
@@ -45,7 +63,7 @@ function Categories() {
     setSelected(objs);
   }
 
-  const submit_data = () => {
+  const submit_data = async () => {
     if(!name){
       return;
     }
@@ -53,12 +71,35 @@ function Categories() {
     let objs_img = image[selected.img-1];
     let colors = color[selected.color-1];
     formed_objs = {
-      "cat_name" : name,
-      "image": config.img_path + objs_img.name + "_white.svg",
+      "name" : name,
+      "img": config.img_path + objs_img.name + "_white.svg",
+      "email": selector.user.user_email,
+      "background" : colors.back,
       "color": colors.color,
-      "backgground" : colors.back
     }
     console.log(formed_objs);
+    const res = await API_CALL(formed_objs, "POST", config.private_url + 'addCategories');
+    if(res.response.status === 200){
+      dispatch(addCategories(formed_objs));
+      dispatch(setCategories(res.result.msg));
+    }else{
+      console.log(res.result.msg);
+    }
+    console.log(formed_objs);
+  }
+
+  const dropItems = async (id) => {
+    let objs = {
+      'id': id,
+      'email': selector.user.user_email
+    }
+    const res = await API_CALL(objs, 'DELETE', config.private_url+ 'dropCategories');
+          console.log(res.result.msg, res);
+    if(res.response.status === 200){
+      console.log(res.result.msg);
+      dispatch(setCategories(res.result.msg));
+      dispatch(addCategories(res.result.msg));
+    }
   }
 
   const onChanges = (e) => {
@@ -68,8 +109,6 @@ function Categories() {
 
   return (
     <div className='conatiner-fluid w-100' style={{ background: '#fafafa' }}>
-      <label>Categories</label>
-      <br />
       <label>Organize your expenses and income by category</label>
       <div className='row mt-2'>
         <div className='col-xl-6 col-lg-6 col-md-12 col-sm-12 mt-3'>
@@ -134,7 +173,27 @@ function Categories() {
           </div>
         </div>
         <div className='col-xl-6 col-lg-6 col-md-12 col-sm-12 mt-3'>
-
+          {console.log(cate.categories.length, cate.addCategories.length, "len")}
+            {
+              (cate.categories.length !== 0 || cate.addCategories.length !== 0) && (
+                  cate.categories.map((val) => {
+                    return(
+                      <div key={val.id} className='col-12 p-2 d-flex align-item-center justify-content-start mt-2' style={{background: val.background, borderRadius: '10px', position: 'relative'}}>
+                        <div className={main.box_divs_circle} style={{background: val.color}}>
+                          <img alt='x-ico' src={val.img} />
+                        </div>
+                        <div className='w-100 px-2 py-3 d-flex align-item-start justify-content-evenly flex-column'>
+                          <label className={main.label_heading}>{val.c_name}</label>
+                          <label className={main.label_subheading}>Active</label>
+                        </div>
+                        <div style={{position: 'absolute', right: 0, display: 'flex', alignItems: 'center', height: '100%', top: '2px',right: '10px'}} >
+                          <img alt='x-ico' src={config.img_path + "trash.svg"} style={{ cursor: 'pointer'}} onClick={() => dropItems(val.id)}/>
+                        </div>
+                      </div>
+                    )
+                  })
+              )
+            }
         </div>
       </div>
     </div>

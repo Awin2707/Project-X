@@ -1,3 +1,5 @@
 {
-    "img_path": "https://raw.githubusercontent.com/Awin2707/Project-X/refs/heads/icons/"
+    "img_path": "https://raw.githubusercontent.com/Awin2707/Project-X/refs/heads/icons/",
+    "public_url": "http://localhost:8081/public/api/v1/",
+    "private_url": "http://localhost:8081/private/api/v1/"
 }

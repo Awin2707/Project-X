@@ -12,6 +12,7 @@ import Categories from './Page/Categories/Categories';
 import Income from './Page/Income/Income';
 import Expenses from './Page/Expenses/Expenses';
 import Filters from './Page/Filters/Filters';
+import ResetPassword from './Page/ResetPassword/ResetPassword';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path='/' element={<Register/>}/>
         <Route path='/signin' element={<Login/>}/>
         <Route path='/verify' element={<Verify/>} /> 
+        <Route path='/reset-password/:redirectParam' element={<ResetPassword/>} /> 
         <Route path='/home' element={<Main/>} >
           <Route index element={<DashBoard/>} />
           <Route path='catgeories' element={<Categories/>} />

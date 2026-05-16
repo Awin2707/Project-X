@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import UserField from '../../InputField/UserField';
 import acc from '../../Style/acc.module.css';
 import config from '../../Config/config.json';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import TopNavbar from '../Navbar/TopNavbar';
 import {useDispatch} from 'react-redux';
-import { setUsers } from '../../Reducers/UserReducers';
-
+import { setToken, setUsers } from '../../Reducers/UserReducers';
+import {API_CALL} from '../../ApiCall/apicall';
 function Register() {
 
   const [inputs, setInput] = useState([]);
@@ -19,6 +19,7 @@ function Register() {
   const [errors, setError] = useState({});
   const refs = useRef([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let objs = [
@@ -26,6 +27,7 @@ function Register() {
       { type: "email", name: "user_email", placeholder: "Enter your Email id", pass: false, img: config.img_path + "mail.svg", err: "", label: "Email" },
       { type: "password", name: "user_pass", placeholder: "Create your Password", pass: true, img: config.img_path + "password.svg", err: "", label: "Password" }
     ];
+    dispatch(setToken(null));
     setInput(objs);
   },[errors]);
 
@@ -72,10 +74,24 @@ function Register() {
     return bool;
   }
 
-  const submitData = () => {
+  const submitData = async () => {
     let bools = validCheck();
     if(bools){
-      dispatch(setUsers(data))
+      let objs = {
+        'email': data.user_email.toLocaleLowerCase(),
+        'name': data.user_name,
+        'pass': data.user_pass
+      }
+      const res = await API_CALL(objs, 'POST', config.public_url + 'createAccount');
+      if(res.response.status === 200){
+        dispatch(setToken(res.result.msg));
+        dispatch(setUsers(data));
+        navigate('/verify');
+      }else{
+        setError({
+          'user_email': res.result.msg
+        });
+      }
     }
   }
   const clicksVerify = (e) => {

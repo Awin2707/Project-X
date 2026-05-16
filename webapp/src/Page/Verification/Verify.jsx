@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import acc from '../../Style/acc.module.css';
 import TopNavbar from '../Navbar/TopNavbar';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { API_CALL } from '../../ApiCall/apicall';
+import config from '../../Config/config.json';
+import { setJwtToken } from '../../Reducers/UserReducers';
 
 function Verify() {
 
@@ -9,8 +14,15 @@ function Verify() {
     const refs = useRef([]);
     const [resend, setResend] = useState(false);
     const [error, setError] = useState(false);
+    const selector = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        console.log(selector.token);
+        if(selector.token == null){
+            navigate('/');
+        }
         const timer = setInterval(() => {
             setTime((prev) => {
                 if(prev <= 1) {
@@ -44,12 +56,25 @@ function Verify() {
         }
     }
 
-    const submitData = () => {
+    const submitData = async () => {
         let value = otp.join('');
         if(value.length < 6) {
             setError("invalid format otp !");
         }else{
+            console.log(selector);
+            let objs = {
+                "Code": value,
+                "email": selector.user.user_email,
+                "token": selector.token,
+            }
+            let res = await API_CALL(objs, 'POST', config.public_url + 'verification');
             setError('');
+            if(res.response.status === 200) {
+                dispatch(setJwtToken(res.result.msg));
+                navigate('/home');
+            }else{
+                setError(res.result.msg);
+            }
         }
     }
 
