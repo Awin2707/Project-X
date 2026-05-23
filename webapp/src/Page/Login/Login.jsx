@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { setJwtToken, setUsers } from '../../Reducers/UserReducers';
 import { API_CALL } from '../../ApiCall/apicall';
 import { generateFingerPrintID } from '../../common/Common';
+import Loading from '../LoadingScreen/Loading';
 
 function Login() {
     const [inputs, setInput] = useState([]);
@@ -18,6 +19,7 @@ function Login() {
     });
     const [errors, setError] = useState({});
     const refs = useRef([]);
+    const [load, setload] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -71,6 +73,7 @@ function Login() {
     const submitData = async () => {
         let bools = validCheck();
         if (bools) {
+            setload(true);
             let objs = {
                 "email": data.user_email,
                 "pass": data.user_pass
@@ -79,12 +82,14 @@ function Login() {
             if(result.response.status === 200){
                 setJwtToken(result.result.msg);
                 dispatch(setUsers(data));
+                setload(false);
                 navigate('/home');
             }else{
                 let err ={
                     'user_pass' : result.result.msg
                 }
                 setError(err);
+                setload(false);
             }
         }
     }
@@ -118,6 +123,7 @@ function Login() {
     return (
     <div className={acc.main}>
       <TopNavbar />
+      {load && <Loading />}
       <div className={acc.top}>
         <div className={acc.box}>
           <label className={acc.heading}>Sign in</label>

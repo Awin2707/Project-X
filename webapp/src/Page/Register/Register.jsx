@@ -7,6 +7,7 @@ import TopNavbar from '../Navbar/TopNavbar';
 import {useDispatch} from 'react-redux';
 import { setToken, setUsers } from '../../Reducers/UserReducers';
 import {API_CALL} from '../../ApiCall/apicall';
+import Loading from '../LoadingScreen/Loading';
 function Register() {
 
   const [inputs, setInput] = useState([]);
@@ -20,6 +21,7 @@ function Register() {
   const refs = useRef([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [load, setload] = useState(false);
 
   useEffect(() => {
     let objs = [
@@ -77,6 +79,7 @@ function Register() {
   const submitData = async () => {
     let bools = validCheck();
     if(bools){
+      setload(true);
       let objs = {
         'email': data.user_email.toLocaleLowerCase(),
         'name': data.user_name,
@@ -86,11 +89,13 @@ function Register() {
       if(res.response.status === 200){
         dispatch(setToken(res.result.msg));
         dispatch(setUsers(data));
+        setload(false);
         navigate('/verify');
       }else{
         setError({
           'user_email': res.result.msg
         });
+        setload(false);
       }
     }
   }
@@ -104,6 +109,9 @@ function Register() {
   return (
     <div className={acc.main}>
       <TopNavbar />
+      {
+        load && (<Loading />)
+      }
       <div className={acc.top}>
         <div className={acc.box}>
           <label className={acc.heading}>Sign up</label>

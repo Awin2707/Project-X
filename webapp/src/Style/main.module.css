@@ -5,7 +5,44 @@
     background-color: #fafafa;
     overflow: hidden; /* ✅ prevent double scroll */
 }
+.loading{
+    top: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(54, 53, 53, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
+    /* blur effect */
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+}
+
+.load{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 5px solid rgb(184, 182, 182);
+    border-right: 5px solid #555555;
+    animation: loader 1s linear infinite;
+}
+.loadtext{
+    margin-left: 15px;
+    color: #d7d7d7;
+}
+
+@keyframes loader {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
+}
 /* LEFT SIDEBAR */
 .left{
     width: 280px; /* ✅ fixed sidebar */

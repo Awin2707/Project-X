@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { API_CALL } from '../../ApiCall/apicall';
 import config from '../../Config/config.json';
 import { setJwtToken } from '../../Reducers/UserReducers';
+import Loading from '../LoadingScreen/Loading';
 
 function Verify() {
 
@@ -14,6 +15,7 @@ function Verify() {
     const refs = useRef([]);
     const [resend, setResend] = useState(false);
     const [error, setError] = useState(false);
+    const [load, setload] = useState(false);
     const selector = useSelector((state) => state.user);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -61,19 +63,21 @@ function Verify() {
         if(value.length < 6) {
             setError("invalid format otp !");
         }else{
-            console.log(selector);
+            setload(true);
             let objs = {
                 "Code": value,
-                "email": selector.user.user_email,
+                "email": selector.user.user_email.toLowerCase(),
                 "token": selector.token,
             }
             let res = await API_CALL(objs, 'POST', config.public_url + 'verification');
             setError('');
             if(res.response.status === 200) {
                 dispatch(setJwtToken(res.result.msg));
+                setload(false);
                 navigate('/home');
             }else{
                 setError(res.result.msg);
+                setload(false);
             }
         }
     }
@@ -81,6 +85,7 @@ function Verify() {
     return (
         <div className={acc.main}>
             <TopNavbar />
+            {load && <Loading/>}
             <div className={acc.top}>
                 <div className={acc.box}>
                     <label className={acc.heading}>Verification</label>
