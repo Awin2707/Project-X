@@ -8,6 +8,7 @@ import com.spring.backend.Service.User.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,12 +65,15 @@ public class UserController {
             UserEntity user = userService.login(userModal);
             if (user != null){
                 String JWT_Token = jwtToken.jwtToken(user.getEmail());
-                Cookie cookie = new Cookie("_utoken",JWT_Token);
-                cookie.setHttpOnly(true);
-                cookie.setSecure(true);
-                cookie.setPath("/");
-                cookie.setMaxAge(7 * 24 * 60 * 60);
-                response.addCookie(cookie);
+                ResponseCookie cookie = ResponseCookie.from("_utoken", JWT_Token)
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None")
+        .path("/")
+        .maxAge(7 * 24 * 60 * 60)
+        .build();
+
+response.setHeader("Set-Cookie", cookie.toString());
                 UsernamePasswordAuthenticationToken tokens = new UsernamePasswordAuthenticationToken(user.getEmail(), null, new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(tokens);
                 return ResponseEntity.ok().body(Map.of("msg", JWT_Token));

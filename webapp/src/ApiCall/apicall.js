@@ -7,7 +7,6 @@ export const API_CALL = async (data, method, url) => {
         },
         body: data ? JSON.stringify(data) : null
     });
-    console.log(data);
     try {
         const result = await response.json();
         return {response, result};
