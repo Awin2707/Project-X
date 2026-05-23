@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/public/api/v1")
@@ -23,6 +26,12 @@ public class UserController {
 
     @Autowired private UserService userService;
     @Autowired private JwtToken jwtToken;
+
+    @GetMapping("ping")
+    public ResponseEntity<?> getMethodName() {
+        return ResponseEntity.ok("alive");
+    }
+    
 
     @PostMapping("/createAccount")
     public ResponseEntity<?> createAccount(@RequestBody UserModal userModal){

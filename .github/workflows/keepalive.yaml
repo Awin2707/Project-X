@@ -9,5 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping Render Server
-        run: curl https://project-x-1-2yzg.onrender.com
+      - name: Wake Render
+        run: |
+          echo "Pinging Render..."
+          curl --retry 1 --retry-delay 1 \
+          https://project-x-1-2yzg.onrender.com/public/api/v1/ping
