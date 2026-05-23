@@ -10,4 +10,4 @@ jobs:
 
     steps:
       - name: Ping Render Server
-        run: curl https://project-x-qa4a.onrender.com
+        run: curl https://project-x-1-2yzg.onrender.com
