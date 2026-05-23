@@ -5,12 +5,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { API_CALL } from '../../ApiCall/apicall';
 import { expenses, setIncome } from '../../Reducers/CategoriesReducer';
 import config from '../../Config/config.json';
+import Loading from '../LoadingScreen/Loading';
 
 function Expenses() {
   const [show, setShow] = useState(false);
   const [data, setData] = useState({});
   const [shows, setShows] = useState(false);
   const [details, setDetails] = useState({});
+  const [load, setLoad] = useState(false);
+  const [error, setError] = useState({});
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -90,10 +93,13 @@ function Expenses() {
     // ]
     // dispatch(setIncome(obj));
     const apicall = async () => {
+      setLoad(true);
       let api = await API_CALL('', 'GET', config.private_url + 'listExpenses');
       if(api.response.status === 200){
+        setLoad(false);
         dispatch(expenses(api.result.msg));
       }
+      setLoad(false);
     }
     apicall();
   }, []);
@@ -130,10 +136,12 @@ function Expenses() {
       id,
       email
     }
+    setLoad(true);
     const apires = await API_CALL(objs, 'DELETE', config.private_url + 'deleteExpenses');
     if(apires.response.status === 200){
       dispatch(expenses(apires.result.msg));
       showsClose();
+      setLoad(false);
     }
   }
 
@@ -153,16 +161,34 @@ function Expenses() {
   }
 
   const SubmitData = async () => {
+    let err = {};
+    if(!data.amount){
+      err.amount = "amount can't be empty !";
+    }
+    if(!data.categories){
+      err.select = "please Select your Categories";
+    }
+    if(!data.date){
+      err.date = "please select the date";
+    }
+    setError(err);
     console.log(data);
     data.email = sel.user.email
-    const apires = await API_CALL(data, 'POST', config.private_url + 'addExpenses');
-    if (apires.response.status === 200) {
-      dispatch(expenses(apires.result.msg));
+      if(Object.keys(err).length === 0){
+        setLoad(true);
+        const apires = await API_CALL(data, 'POST', config.private_url + 'addExpenses');
+        if (apires.response.status === 200) {
+          dispatch(expenses(apires.result.msg));
+          setData({});
+          setLoad(false);
+        }
+        setLoad(false);
+        handleClose();
     }
-    handleClose();
   }
   return (
     <div className='container-fluid'>
+      {load && <Loading/>}
       <div className='d-flex w-100 align-items-center justify-content-between'>
         <label>Add Expenses</label>
         <Button style={{color: '#ef4444', background: '#FEF2F2', fontSize: '16px', border: '1px solid #ef4444', borderRadius: '7px'}} onClick={handleShow}>
@@ -328,24 +354,28 @@ function Expenses() {
             <div className={main.box_div}>
               <label className={main.box_subHead}>Amount</label>
               <input type='number' className={main.box_inputs} placeholder='0.0' name='amount' value={data.income} onChange={userIncome} />
+              {error && error.amount && <label>{error.amount}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Source</label>
               <select className={main.box_inputs} name='categories' value={data.select} onChange={userIncome}>
+                <option value={""} selected>No item Selected</option>
                 {
-                  select.categories.length != 0 ? (
+                  select.categories.length != 0 && (
                     select.categories.map((val) => {
                       return (
                         <option key={val.id} value={val.c_name}>{val.c_name}</option>
                       )
                     })
-                  ) : <option selected>No item Selected</option>
+                  )
                 }
               </select>
+              {error && error.select && <label>{error.select}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Date</label>
               <input type='date' className={main.box_inputs} name='date' value={data.date} onChange={userIncome} />
+              {error && error.date && <label>{error.date}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Notes (Optional)</label>

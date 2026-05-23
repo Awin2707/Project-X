@@ -4,6 +4,7 @@ import config from '../../Config/config.json';
 import { BarChart, Cell, Legend, Pie, Tooltip, ResponsiveContainer, PieChart, CartesianGrid, XAxis, YAxis, Bar } from 'recharts';
 import { API_CALL } from '../../ApiCall/apicall';
 import { useDispatch, useSelector } from 'react-redux';
+import Loading from '../LoadingScreen/Loading'
 import { listitems } from '../../Reducers/CategoriesReducer';
 
 function Dashboard() {
@@ -32,6 +33,7 @@ function Dashboard() {
   });
   const [piedata, setPie] = useState([]);
   const [monthchart, setchart] = useState([]);
+  const [load, setLoad] = useState(true);
   const [trans, setTrans] = useState([]);
   const select = useSelector((state) => state.categories);
 
@@ -40,6 +42,7 @@ function Dashboard() {
       const apis = await API_CALL('', 'GET', config.private_url + 'listItems');
       if (apis.response.status === 200) {
         dispatch(listitems(apis.result.msg));
+        setLoad(false);
       }
     }
     fetchCall();
@@ -126,6 +129,7 @@ function Dashboard() {
 
   return (
     <div className="container-fluid">
+      {load && <Loading />}
       <div className="row g-3">
         <div className="col-12 col-sm-6 col-lg-3">
           <div className={main.navbox}>

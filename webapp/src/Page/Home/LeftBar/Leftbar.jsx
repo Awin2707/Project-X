@@ -3,7 +3,8 @@ import main from '../../../Style/main.module.css';
 import config from '../../../Config/config.json';
 import {Link, NavLink, useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
-import { setPage } from '../../../Reducers/UserReducers';
+import { setLogout, setPage } from '../../../Reducers/UserReducers';
+import Logout from '../../Logout/logout';
 
 function Leftbar() {
     const [count, setCount] = useState(1);
@@ -13,9 +14,14 @@ function Leftbar() {
         navigate("/home");
     },[]);
 
-    const increaseCount = (count, name) => {
+    const increaseCount = (count, name, log) => {
         setCount(count);
-        dispatch(setPage(name));
+        if(name != null){
+            dispatch(setPage(name));
+        }
+        if(log){
+            dispatch(setLogout(log));
+        }
     }
 
     const logout = () => {
@@ -82,7 +88,7 @@ function Leftbar() {
                         <label className={main.labels}>Settings</label>
                     </div>
                 </NavLink>
-                <NavLink className={count === 7 ? main.selected : main.not_Selected} onClick={() => increaseCount(7)}>
+                <NavLink className={count === 7 ? main.selected : main.not_Selected} onClick={() => increaseCount(7, null, true)}>
                     <div className={main.icons}>
                         <img alt='x-ico' src={count === 7 ? config.img_path + "logout.svg" : config.img_path + "logout_nc.svg" } />
                     </div>

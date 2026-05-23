@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { API_CALL } from '../../ApiCall/apicall';
 import { setIncome } from '../../Reducers/CategoriesReducer';
 import config from '../../Config/config.json';
+import Loading from '../LoadingScreen/Loading';
 
 function Income() {
   const [show, setShow] = useState(false);
@@ -15,6 +16,8 @@ function Income() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const showsClose = () => setShows(false);
+  const [error, setError] = useState({});
+  const [load, setLoad] = useState(false);
   const select = useSelector((state) => state.categories);
   const sel = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -90,10 +93,12 @@ function Income() {
     // ]
     // dispatch(setIncome(obj));
     const apicall = async () => {
+      setLoad(true);
       let api = await API_CALL('', 'GET', config.private_url + 'listIncome');
       if(api.response.status === 200){
         dispatch(setIncome(api.result.msg));
       }
+      setLoad(false);
     }
     apicall();
   }, []);
@@ -130,11 +135,14 @@ function Income() {
       id,
       email
     }
+    setLoad(true);
     const apires = await API_CALL(objs, 'DELETE', config.private_url + 'deleteIncome');
     if(apires.response.status === 200){
       dispatch(setIncome(apires.result.msg));
       showsClose();
+      setLoad(false);
     }
+    setLoad(false);
   }
 
   const userIncome = (e) => {
@@ -153,16 +161,34 @@ function Income() {
   }
 
   const SubmitData = async () => {
-    console.log(data);
-    data.email = sel.user.email
-    const apires = await API_CALL(data, 'POST', config.private_url + 'addIncome');
-    if (apires.response.status === 200) {
-      dispatch(setIncome(apires.result.msg));
+    let err = {};
+    if(!data.amount){
+      err.amount = "amount can't be empty !";
     }
-    handleClose();
+    if(!data.categories){
+      err.select = "please Select your Categories";
+    }
+    if(!data.date){
+      err.date = "please select the date";
+    }
+    setError(err);
+    data.email = sel.user.email;
+    console.log(data);
+    if(Object.keys(err).length === 0){
+      setLoad(true);
+      const apires = await API_CALL(data, 'POST', config.private_url + 'addIncome');
+      if (apires.response.status === 200) {
+        dispatch(setIncome(apires.result.msg));
+        handleClose();
+        setLoad(false);
+        setData({});
+      }
+      setLoad(false);
+    }
   }
   return (
     <div className='container-fluid'>
+      {load && <Loading/>}
       <div className='d-flex w-100 align-items-center justify-content-between'>
         <label>Add Income</label>
         <Button style={{color: '#22c55e', background: '#ECFDF5', fontSize: '16px', border: '1px solid #22c55e', borderRadius: '7px'}} onClick={handleShow}>
@@ -210,7 +236,6 @@ function Income() {
       </div>
       <div className='col-12 mt-3'>
         <div className='row g-2'>
-          {console.log(select.income)}
           {
             select.income.length !== 0 ? (
               select.income && select.income.map((val) => {
@@ -329,24 +354,28 @@ function Income() {
             <div className={main.box_div}>
               <label className={main.box_subHead}>Amount</label>
               <input type='number' className={main.box_inputs} placeholder='0.0' name='amount' value={data.income} onChange={userIncome} />
+              {error && error.amount && <label>{error.amount}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Source</label>
               <select className={main.box_inputs} name='categories' value={data.select} onChange={userIncome}>
+                <option value={""} selected>No item Selected</option>
                 {
-                  select.categories.length != 0 ? (
-                    select.categories.map((val) => {
+                  select.categories.length != 0 && (
+                    select.categories.map((val, id) => {
                       return (
                         <option key={val.id} value={val.c_name}>{val.c_name}</option>
                       )
                     })
-                  ) : <option selected>No item Selected</option>
+                  )
                 }
               </select>
+              {error && error.select && <label>{error.select}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Date</label>
               <input type='date' className={main.box_inputs} name='date' value={data.date} onChange={userIncome} />
+              {error && error.date && <label>{error.date}</label>}
             </div>
             <div className={main.box_div}>
               <label className={main.box_subHead}>Notes (Optional)</label>
