@@ -3,7 +3,7 @@ import main from '../../Style/main.module.css';
 import acc from '../../Style/acc.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLogout } from '../../Reducers/UserReducers';
+import { setLogout, setPage } from '../../Reducers/UserReducers';
 
 function Logout() {
     const navi = useNavigate();
@@ -14,7 +14,8 @@ function Logout() {
     const notLogout = () => {
         console.log(path);
         dispatch(setLogout(false));
-        navi(`/home/${path}`);
+        dispatch(setPage("Dashboard"));
+        navi(`/home`);
     }
     const yesLogout = () => {
         navi("/");
